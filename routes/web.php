@@ -17,3 +17,9 @@ Route::get('/testing-logs', function () {
 
     return "Logs sending!";
 });
+
+Route::get('/sentry-test', function () {
+    \Sentry\captureException(new Exception('Sentry test from Laravel'));
+
+    return 'sent';
+});
