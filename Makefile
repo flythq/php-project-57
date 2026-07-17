@@ -17,10 +17,10 @@ setup:
 validate:
 	composer validate
 lint:
-	composer exec --verbose phpcs -- --standard=PSR12 app tests
-	./vendor/bin/phpstan analyse app tests
+	composer exec --verbose phpcs
+	./vendor/bin/phpstan analyse --memory-limit=2G
 lint-fix:
-	composer exec --verbose phpcbf -- --standard=PSR12 app tests
+	composer exec --verbose phpcbf
 test:
 	php artisan test
 

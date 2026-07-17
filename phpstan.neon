@@ -1,0 +1,10 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app
+        - tests
+
+    # Start at a reasonable strictness; bump as the codebase matures.
+    level: 6
