@@ -2,7 +2,7 @@
     <div class="flex flex-wrap items-center justify-between max-w-screen-xl px-4 mx-auto">
         <a href="{{ route('home') }}" class="flex items-center">
             <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-black">
-                Менеджер задач
+                {{ __('app.name') }}
             </span>
         </a>
 
