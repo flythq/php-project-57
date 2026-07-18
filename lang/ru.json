@@ -35,5 +35,21 @@
     "Log Out": "Выйти",
     "Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.": "Забыли пароль? Не проблема. Укажите свой адрес электронной почты, и мы отправим ссылку для сброса пароля.",
     "This is a secure area of the application. Please confirm your password before continuing.": "Это защищённая область приложения. Пожалуйста, подтвердите пароль для продолжения.",
-    "Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another.": "Спасибо за регистрацию! Прежде чем начать, подтвердите свой адрес электронной почты, перейдя по ссылке из письма. Если письмо не пришло, мы можем отправить его повторно."
+    "Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another.": "Спасибо за регистрацию! Прежде чем начать, подтвердите свой адрес электронной почты, перейдя по ссылке из письма. Если письмо не пришло, мы можем отправить его повторно.",
+    "Statuses": "Статусы",
+    "ID": "ID",
+    "Created at": "Дата создания",
+    "Create status": "Создать статус",
+    "Edit status": "Изменить статус",
+    "Create": "Создать",
+    "Edit": "Изменить",
+    "Delete": "Удалить",
+    "Back": "Назад",
+    "Actions": "Действия",
+    "No statuses": "Статусов нет",
+    "Are you sure?": "Вы уверены?",
+    "Status created successfully.": "Статус успешно создан.",
+    "Status updated successfully.": "Статус успешно изменён.",
+    "Status deleted successfully.": "Статус успешно удалён.",
+    "Cannot delete a status that is linked to a task.": "Нельзя удалить статус, связанный с задачей."
 }
