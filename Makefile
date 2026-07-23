@@ -25,6 +25,7 @@ test:
 	php artisan test
 
 test-coverage:
+	mkdir -p build/logs
 	XDEBUG_MODE=coverage composer exec --verbose phpunit tests -- --coverage-clover build/logs/clover.xml
 
 test-coverage-text:
