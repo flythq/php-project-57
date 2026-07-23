@@ -10,14 +10,21 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
     && php -r "unlink('composer-setup.php');"
 
-RUN curl -sL https://deb.nodesource.com/setup_24.x | bash -
-RUN apt-get install -y nodejs
+RUN apt-get update && apt-get install -y ca-certificates gnupg \
+    && mkdir -p /etc/apt/keyrings \
+    && curl -fsSL --proto =https --tlsv1.2 https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key -o /tmp/nodesource.key \
+    && gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg /tmp/nodesource.key \
+    && rm /tmp/nodesource.key \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_24.x nodistro main" \
+       > /etc/apt/sources.list.d/nodesource.list \
+    && apt-get update \
+    && apt-get install -y nodejs
 
 WORKDIR /app
 
 COPY . .
 RUN composer install
-RUN npm ci
+RUN npm ci --ignore-scripts
 RUN npm run build
 
 RUN > database/database.sqlite

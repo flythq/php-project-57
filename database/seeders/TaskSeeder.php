@@ -33,7 +33,7 @@ class TaskSeeder extends Seeder
             ->each(function (Task $task) use ($labels): void {
                 if ($labels->isNotEmpty()) {
                     $task->labels()->attach(
-                        $labels->random(rand(1, min(3, $labels->count())))->pluck('id')
+                        $labels->random(random_int(1, min(3, $labels->count())))->pluck('id')
                     );
                 }
             });
