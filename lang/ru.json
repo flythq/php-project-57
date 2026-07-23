@@ -49,5 +49,9 @@
     "Label updated successfully.": "Метка успешно изменена.",
     "Label deleted successfully.": "Метка успешно удалена.",
     "Apply": "Применить",
-    "Update": "Обновить"
+    "Update": "Обновить",
+    "Showing": "Показано",
+    "to": "—",
+    "of": "из",
+    "results": "результатов."
 }
