@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="text-6xl text-gray-900 leading-tight">
-            {{ __('Create status') }}
+            {{ __('Edit label') }}
         </h2>
     </x-slot>
 
@@ -9,8 +9,9 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <form method="POST" action="{{ route('task_statuses.store') }}" novalidate>
+                    <form method="POST" action="{{ route('labels.update', $label) }}" novalidate>
                         @csrf
+                        @method('PATCH')
 
                         <div>
                             <x-input-label for="name" :value="__('Name')" />
@@ -18,19 +19,28 @@
                                           class="block mt-1 w-full"
                                           type="text"
                                           name="name"
-                                          :value="old('name')"
+                                          :value="old('name', $label->name)"
                                           required autofocus />
                             <x-input-error :messages="$errors->get('name')" class="mt-2" />
                         </div>
 
+                        <div class="mt-4">
+                            <x-input-label for="description" :value="__('Description')" />
+                            <textarea id="description"
+                                      name="description"
+                                      class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                      rows="4">{{ old('description', $label->description) }}</textarea>
+                            <x-input-error :messages="$errors->get('description')" class="mt-2" />
+                        </div>
+
                         <div class="flex items-center justify-end mt-4">
-                            <a href="{{ route('task_statuses.index') }}"
+                            <a href="{{ route('labels.index') }}"
                                class="underline text-sm text-gray-600 hover:text-gray-900 mr-4">
                                 {{ __('Back') }}
                             </a>
 
                             <x-primary-button>
-                                {{ __('Create') }}
+                                {{ __('Save') }}
                             </x-primary-button>
                         </div>
                     </form>

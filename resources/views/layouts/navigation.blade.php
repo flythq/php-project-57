@@ -30,7 +30,7 @@
         <div class="items-center justify-between hidden w-full lg:flex lg:w-auto lg:order-1">
             <ul class="flex flex-col  font-medium lg:flex-row lg:space-x-8 lg:mt-0">
                 <li>
-                    <a href=""
+                    <a href="{{ route('tasks.index') }}"
                        class="block py-2 pl-3 pr-4 text-gray-700 hover:text-blue-700 lg:p-0">
                         Задачи
                     </a>
@@ -42,7 +42,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href=""
+                    <a href="{{ route('labels.index') }}"
                        class="block py-2 pl-3 pr-4 text-gray-700 hover:text-blue-700 lg:p-0">
                         Метки
                     </a>

@@ -21,9 +21,11 @@ class TaskStatusTest extends TestCase
         $this->user = User::factory()->create();
     }
 
-    public function test_guest_cannot_access_statuses_index(): void
+    public function test_anyone_can_see_statuses_index(): void
     {
-        $this->get('/task_statuses')->assertRedirect('/login');
+        $status = TaskStatus::factory()->create();
+
+        $this->get('/task_statuses')->assertStatus(200)->assertSee($status->name);
     }
 
     public function test_authenticated_user_can_see_statuses_index(): void

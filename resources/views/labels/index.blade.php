@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="text-6xl text-gray-900 leading-tight">
-            {{ __('Statuses') }}
+            {{ __('Labels') }}
         </h2>
     </x-slot>
 
@@ -11,34 +11,36 @@
                 <div class="p-6 text-gray-900">
                     @auth
                         <div class="mb-4">
-                            <a href="{{ route('task_statuses.create') }}"
+                            <a href="{{ route('labels.create') }}"
                                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                {{ __('Create status') }}
+                                {{ __('Create label') }}
                             </a>
                         </div>
                     @endauth
 
-                    @if ($statuses->isEmpty())
-                        <p class="text-gray-500">{{ __('No statuses') }}.</p>
+                    @if ($labels->isEmpty())
+                        <p class="text-gray-500">{{ __('No labels') }}.</p>
                     @else
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="border-b">
                                     <th class="py-2 px-3 uppercase">{{ __('ID') }}</th>
                                     <th class="py-2 px-3 uppercase">{{ __('Name') }}</th>
+                                    <th class="py-2 px-3 uppercase">{{ __('Description') }}</th>
                                     <th class="py-2 px-3 uppercase">{{ __('Created at') }}</th>
                                     <th class="py-2 px-3 uppercase">{{ __('Actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($statuses as $status)
+                                @foreach ($labels as $label)
                                     <tr class="border-b">
-                                        <td class="py-2 px-3">{{ $status->id }}</td>
-                                        <td class="py-2 px-3">{{ $status->name }}</td>
-                                        <td class="py-2 px-3">{{ $status->created_at?->format('d.m.Y') }}</td>
+                                        <td class="py-2 px-3">{{ $label->id }}</td>
+                                        <td class="py-2 px-3">{{ $label->name }}</td>
+                                        <td class="py-2 px-3">{{ $label->description ?? '—' }}</td>
+                                        <td class="py-2 px-3">{{ $label->created_at?->format('d.m.Y') }}</td>
                                         <td class="py-2 px-3">
                                             @auth
-                                                <form action="{{ route('task_statuses.destroy', $status) }}"
+                                                <form action="{{ route('labels.destroy', $label) }}"
                                                       method="POST"
                                                       class="inline"
                                                       onsubmit="return confirm('{{ __('Are you sure?') }}');">
@@ -50,7 +52,7 @@
                                                     </button>
                                                 </form>
 
-                                                <a href="{{ route('task_statuses.edit', $status) }}"
+                                                <a href="{{ route('labels.edit', $label) }}"
                                                    class="text-blue-600 hover:text-blue-800 ml-3">{{ __('Edit') }}</a>
                                             @endauth
                                         </td>

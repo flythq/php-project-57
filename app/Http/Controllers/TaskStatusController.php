@@ -65,7 +65,7 @@ class TaskStatusController extends Controller
     public function destroy(TaskStatus $taskStatus): RedirectResponse
     {
         if ($taskStatus->tasks()->exists()) {
-            flash(__('Cannot delete a status that is linked to a task.'))->error();
+            flash(__('Не удалось удалить статус'))->error();
 
             return redirect()->route('task_statuses.index');
         }

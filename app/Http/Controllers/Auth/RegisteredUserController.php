@@ -38,6 +38,6 @@ class RegisteredUserController extends Controller
 
         flash('Аккаунт успешно создан.')->success();
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('home', absolute: false));
     }
 }

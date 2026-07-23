@@ -30,7 +30,7 @@ class AuthenticatedSessionController extends Controller
 
         flash('Вы вошли в систему.')->success();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended(route('home', absolute: false));
     }
 
     /**
