@@ -50,16 +50,12 @@
                             </a>
 
                             @can('delete', $task)
-                                <form action="{{ route('tasks.destroy', $task) }}"
-                                      method="POST"
-                                      onsubmit="return confirm('{{ __('Are you sure?') }}');">
+                                @php $deleteForm = Html::form('DELETE', route('tasks.destroy', $task))->attribute('onsubmit', 'return confirm(\''.__('Are you sure?').'\');'); @endphp
+                                {!! $deleteForm->open() !!}
                                     @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                            class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                        {{ __('Delete') }}
-                                    </button>
-                                </form>
+                                    {!! Html::submit(__('Delete'))
+                                        ->class('bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded') !!}
+                                {!! $deleteForm->close() !!}
                             @endcan
                         @endauth
                     </div>

@@ -38,17 +38,11 @@
                                         <td class="py-2 px-3">{{ $status->created_at?->format('d.m.Y') }}</td>
                                         <td class="py-2 px-3">
                                             @auth
-                                                <form action="{{ route('task_statuses.destroy', $status) }}"
-                                                      method="POST"
-                                                      class="inline"
-                                                      onsubmit="return confirm('{{ __('Are you sure?') }}');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit"
-                                                            class="text-red-600 hover:text-red-800">
-                                                        {{ __('Delete') }}
-                                                    </button>
-                                                </form>
+                                                @php $deleteForm = Html::form('DELETE', route('task_statuses.destroy', $status))->attribute('onsubmit', 'return confirm(\''.__('Are you sure?').'\');')->class('inline'); @endphp
+                                                {!! $deleteForm->open() !!}
+                                                    {!! Html::submit(__('Delete'))
+                                                        ->class('text-red-600 hover:text-red-800') !!}
+                                                {!! $deleteForm->close() !!}
 
                                                 <a href="{{ route('task_statuses.edit', $status) }}"
                                                    class="text-blue-600 hover:text-blue-800 ml-3">{{ __('Edit') }}</a>

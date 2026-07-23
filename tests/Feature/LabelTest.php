@@ -51,6 +51,28 @@ class LabelTest extends TestCase
             ->assertSessionHasErrors('name');
     }
 
+    public function test_store_rejects_duplicate_name(): void
+    {
+        Label::factory()->create(['name' => 'bug']);
+
+        $this->actingAs($this->user)
+            ->post('/labels', ['name' => 'bug'])
+            ->assertSessionHasErrors('name');
+
+        $this->assertDatabaseCount('labels', 1);
+    }
+
+    public function test_update_allows_keeping_same_name(): void
+    {
+        $label = Label::factory()->create(['name' => 'bug']);
+
+        $this->actingAs($this->user)
+            ->patch("/labels/{$label->id}", ['name' => 'bug', 'description' => ''])
+            ->assertRedirect('/labels');
+
+        $this->assertDatabaseHas('labels', ['id' => $label->id, 'name' => 'bug']);
+    }
+
     public function test_authenticated_user_can_update_label(): void
     {
         $label = Label::factory()->create(['name' => 'old']);

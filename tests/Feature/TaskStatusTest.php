@@ -60,6 +60,28 @@ class TaskStatusTest extends TestCase
             ->assertSessionHasErrors('name');
     }
 
+    public function test_store_rejects_duplicate_name(): void
+    {
+        TaskStatus::factory()->create(['name' => 'в работе']);
+
+        $this->actingAs($this->user)
+            ->post('/task_statuses', ['name' => 'в работе'])
+            ->assertSessionHasErrors('name');
+
+        $this->assertDatabaseCount('task_statuses', 1);
+    }
+
+    public function test_update_allows_keeping_same_name(): void
+    {
+        $status = TaskStatus::factory()->create(['name' => 'в работе']);
+
+        $this->actingAs($this->user)
+            ->patch("/task_statuses/{$status->id}", ['name' => 'в работе'])
+            ->assertRedirect('/task_statuses');
+
+        $this->assertDatabaseHas('task_statuses', ['id' => $status->id, 'name' => 'в работе']);
+    }
+
     public function test_authenticated_user_can_open_edit_form(): void
     {
         $status = TaskStatus::factory()->create();

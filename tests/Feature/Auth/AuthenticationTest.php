@@ -24,9 +24,22 @@ class AuthenticationTest extends TestCase
         $this->post('/login', [
             'email' => $user->email,
             'password' => 'wrong-password',
-        ]);
+        ])->assertSessionHasErrors('email');
 
         $this->assertGuest();
+    }
+
+    public function test_users_can_authenticate_with_valid_credentials(): void
+    {
+        $user = User::factory()->create(['password' => 'password123']);
+
+        $response = $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'password123',
+        ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect('/');
     }
 
     public function test_users_can_logout(): void

@@ -9,75 +9,46 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <form method="POST" action="{{ route('tasks.update', $task) }}" novalidate>
-                        @csrf
-                        @method('PATCH')
+                    @php $form = Html::form('PATCH', route('tasks.update', $task))->novalidate(); @endphp
+                    {!! $form->open() !!}
 
                         <div>
-                            <x-input-label for="name" :value="__('Name')" />
-                            <x-text-input id="name"
-                                          class="block mt-1 w-full"
-                                          type="text"
-                                          name="name"
-                                          :value="old('name', $task->name)"
-                                          required autofocus />
+                            {!! Html::label(__('Name'), 'name')->class('block font-medium text-sm text-gray-700') !!}
+                            {!! Html::text('name', $task->name)->id('name')
+                                ->class('block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm')
+                                ->attribute('required')
+                                ->autofocus() !!}
                             <x-input-error :messages="$errors->get('name')" class="mt-2" />
                         </div>
 
                         <div class="mt-4">
-                            <x-input-label for="description" :value="__('Description')" />
-                            <textarea id="description"
-                                      name="description"
-                                      class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                                      rows="4">{{ old('description', $task->description) }}</textarea>
+                            {!! Html::label(__('Description'), 'description')->class('block font-medium text-sm text-gray-700') !!}
+                            {!! Html::textarea('description', $task->description)->id('description')
+                                ->class('block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm')
+                                ->rows(4) !!}
                             <x-input-error :messages="$errors->get('description')" class="mt-2" />
                         </div>
 
                         <div class="mt-4">
-                            <x-input-label for="status_id" :value="__('Status')" />
-                            <select id="status_id"
-                                    name="status_id"
-                                    class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                @foreach ($statuses as $status)
-                                    <option value="{{ $status->id }}"
-                                            {{ old('status_id', $task->status_id) == $status->id ? 'selected' : '' }}>
-                                        {{ $status->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            {!! Html::label(__('Status'), 'status_id')->class('block font-medium text-sm text-gray-700') !!}
+                            {!! Html::select('status_id', $statuses->pluck('name', 'id'), $task->status_id)->id('status_id')
+                                ->class('block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm') !!}
                             <x-input-error :messages="$errors->get('status_id')" class="mt-2" />
                         </div>
 
                         <div class="mt-4">
-                            <x-input-label for="assigned_to_id" :value="__('Assignee')" />
-                            <select id="assigned_to_id"
-                                    name="assigned_to_id"
-                                    class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                <option value="">{{ __('Not assigned') }}</option>
-                                @foreach ($users as $user)
-                                    <option value="{{ $user->id }}"
-                                            {{ old('assigned_to_id', $task->assigned_to_id) == $user->id ? 'selected' : '' }}>
-                                        {{ $user->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            {!! Html::label(__('Assignee'), 'assigned_to_id')->class('block font-medium text-sm text-gray-700') !!}
+                            {!! Html::select('assigned_to_id', $users->pluck('name', 'id'), $task->assigned_to_id)->id('assigned_to_id')
+                                ->class('block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm')
+                                ->placeholder(__('Not assigned')) !!}
                             <x-input-error :messages="$errors->get('assigned_to_id')" class="mt-2" />
                         </div>
 
                         <div class="mt-4">
-                            <x-input-label for="labels" :value="__('Labels')" />
-                            <select id="labels"
-                                    name="labels[]"
-                                    multiple
-                                    class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                                    size="5">
-                                @foreach ($labels as $label)
-                                    <option value="{{ $label->id }}"
-                                            {{ in_array($label->id, old('labels', $task->labels->pluck('id')->all())) ? 'selected' : '' }}>
-                                        {{ $label->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            {!! Html::label(__('Labels'), 'labels')->class('block font-medium text-sm text-gray-700') !!}
+                            {!! Html::multiselect('labels', $labels->pluck('name', 'id'), $task->labels->pluck('id')->all())->id('labels')
+                                ->class('block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm')
+                                ->attribute('size', 5) !!}
                             <x-input-error :messages="$errors->get('labels')" class="mt-2" />
                         </div>
 
@@ -87,11 +58,10 @@
                                 {{ __('Back') }}
                             </a>
 
-                            <x-primary-button>
-                                {{ __('Save') }}
-                            </x-primary-button>
+                            {!! Html::submit(__('Update'))
+                                ->class('inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150') !!}
                         </div>
-                    </form>
+                    {!! $form->close() !!}
                 </div>
             </div>
         </div>

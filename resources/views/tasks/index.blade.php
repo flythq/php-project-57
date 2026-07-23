@@ -9,51 +9,31 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <form method="GET" action="{{ route('tasks.index') }}"
-                          class="mb-4 flex flex-wrap gap-4 items-end" novalidate>
+                    @php $filterForm = Html::form('GET', route('tasks.index')); @endphp
+                    {!! $filterForm->class('mb-4 flex flex-wrap gap-4 items-end')->novalidate()->open() !!}
                         <div>
-                            <select id="filter_status_id" name="filter[status_id]"
-                                    class="mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                <option value="">{{ __('Status') }}</option>
-                                @foreach ($statuses as $status)
-                                    <option value="{{ $status->id }}"
-                                            {{ (string) request('filter.status_id') === (string) $status->id ? 'selected' : '' }}>
-                                        {{ $status->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            {!! Html::select('filter[status_id]', $statuses->pluck('name', 'id'), request('filter.status_id'))
+                                ->id('filter_status_id')
+                                ->placeholder(__('Status'))
+                                ->class('mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm') !!}
                         </div>
 
                         <div>
-                            <select id="filter_assigned_to_id" name="filter[assigned_to_id]"
-                                    class="mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                <option value="">{{ __('Assignee') }}</option>
-                                @foreach ($users as $user)
-                                    <option value="{{ $user->id }}"
-                                            {{ (string) request('filter.assigned_to_id') === (string) $user->id ? 'selected' : '' }}>
-                                        {{ $user->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            {!! Html::select('filter[assigned_to_id]', $users->pluck('name', 'id'), request('filter.assigned_to_id'))
+                                ->id('filter_assigned_to_id')
+                                ->placeholder(__('Assignee'))
+                                ->class('mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm') !!}
                         </div>
 
                         <div>
-                            <select id="filter_created_by_id" name="filter[created_by_id]"
-                                    class="mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                <option value="">{{ __('Author') }}</option>
-                                @foreach ($users as $user)
-                                    <option value="{{ $user->id }}"
-                                            {{ (string) request('filter.created_by_id') === (string) $user->id ? 'selected' : '' }}>
-                                        {{ $user->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            {!! Html::select('filter[created_by_id]', $users->pluck('name', 'id'), request('filter.created_by_id'))
+                                ->id('filter_created_by_id')
+                                ->placeholder(__('Author'))
+                                ->class('mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm') !!}
                         </div>
 
-                        <button type="submit"
-                                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            {{ __('Apply') }}
-                        </button>
+                        {!! Html::submit(__('Apply'))
+                            ->class('bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded') !!}
 
                         @auth
                             <a href="{{ route('tasks.create') }}"
@@ -61,7 +41,7 @@
                                 {{ __('Create task') }}
                             </a>
                         @endauth
-                    </form>
+                    {!! $filterForm->close() !!}
 
                     @if ($tasks->isEmpty())
                         <p class="text-gray-500">{{ __('No tasks') }}.</p>
@@ -96,6 +76,13 @@
                                             @auth
                                                 <a href="{{ route('tasks.edit', $task) }}"
                                                    class="text-blue-600 hover:text-blue-800">{{ __('Edit') }}</a>
+                                                @can('delete', $task)
+                                                    @php $deleteForm = Html::form('DELETE', route('tasks.destroy', $task))->attribute('onsubmit', 'return confirm(\''.__('Are you sure?').'\');')->class('inline ml-3'); @endphp
+                                                    {!! $deleteForm->open() !!}
+                                                        {!! Html::submit(__('Delete'))
+                                                            ->class('text-red-600 hover:text-red-800') !!}
+                                                    {!! $deleteForm->close() !!}
+                                                @endcan
                                             @endauth
                                         </td>
                                     </tr>

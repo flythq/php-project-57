@@ -2,18 +2,18 @@
 
 namespace Tests\Feature;
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
     /**
-     * A basic test example.
+     * The home page shows the Hexlet greeting heading.
      */
     public function testTheApplicationReturnsASuccessfulResponse(): void
     {
         $response = $this->get('/');
 
         $response->assertStatus(200);
+        $response->assertSee('Привет от Хекслета!', false);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreTaskStatusRequest extends FormRequest
 {
@@ -23,7 +24,23 @@ class StoreTaskStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string'],
+            'name' => [
+                'required',
+                'string',
+                Rule::unique('task_statuses', 'name')->ignore($this->route('task_status')),
+            ],
+        ];
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'name.unique' => 'Статус с таким именем уже существует.',
         ];
     }
 }
