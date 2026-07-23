@@ -50,11 +50,19 @@
                             </a>
 
                             @can('delete', $task)
-                                @php $deleteForm = Html::form('DELETE', route('tasks.destroy', $task))->attribute('onsubmit', 'return confirm(\''.__('Are you sure?').'\');'); @endphp
+                                @php
+                                    $deleteFormId = 'delete-form-' . $task->id;
+                                    $deleteForm = Html::form('DELETE', route('tasks.destroy', $task))
+                                        ->attribute('id', $deleteFormId);
+                                @endphp
+                                <a href="#"
+                                   class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                                   onclick="event.preventDefault();
+                                            if (confirm('{{ __('Are you sure?') }}'))
+                                                document.getElementById('{{ $deleteFormId }}').submit();">
+                                    {{ __('Delete') }}
+                                </a>
                                 {!! $deleteForm->open() !!}
-                                    @csrf
-                                    {!! Html::submit(__('Delete'))
-                                        ->class('bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded') !!}
                                 {!! $deleteForm->close() !!}
                             @endcan
                         @endauth

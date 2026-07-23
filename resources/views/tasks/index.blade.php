@@ -77,10 +77,20 @@
                                                 <a href="{{ route('tasks.edit', $task) }}"
                                                    class="text-blue-600 hover:text-blue-800">{{ __('Edit') }}</a>
                                                 @can('delete', $task)
-                                                    @php $deleteForm = Html::form('DELETE', route('tasks.destroy', $task))->attribute('onsubmit', 'return confirm(\''.__('Are you sure?').'\');')->class('inline ml-3'); @endphp
+                                                    @php
+                                                        $deleteFormId = 'delete-form-' . $task->id;
+                                                        $deleteForm = Html::form('DELETE', route('tasks.destroy', $task))
+                                                            ->attribute('id', $deleteFormId)
+                                                            ->class('hidden inline ml-3');
+                                                    @endphp
+                                                    <a href="#"
+                                                       class="text-red-600 hover:text-red-800 ml-3"
+                                                       onclick="event.preventDefault();
+                                                                if (confirm('{{ __('Are you sure?') }}'))
+                                                                    document.getElementById('{{ $deleteFormId }}').submit();">
+                                                        {{ __('Delete') }}
+                                                    </a>
                                                     {!! $deleteForm->open() !!}
-                                                        {!! Html::submit(__('Delete'))
-                                                            ->class('text-red-600 hover:text-red-800') !!}
                                                     {!! $deleteForm->close() !!}
                                                 @endcan
                                             @endauth

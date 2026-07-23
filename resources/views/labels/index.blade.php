@@ -40,10 +40,20 @@
                                         <td class="py-2 px-3">{{ $label->created_at?->format('d.m.Y') }}</td>
                                         <td class="py-2 px-3">
                                             @auth
-                                                @php $deleteForm = Html::form('DELETE', route('labels.destroy', $label))->attribute('onsubmit', 'return confirm(\''.__('Are you sure?').'\');')->class('inline'); @endphp
+                                                @php
+                                                    $deleteFormId = 'delete-form-' . $label->id;
+                                                    $deleteForm = Html::form('DELETE', route('labels.destroy', $label))
+                                                        ->attribute('id', $deleteFormId)
+                                                        ->class('hidden');
+                                                @endphp
+                                                <a href="#"
+                                                   class="text-red-600 hover:text-red-800"
+                                                   onclick="event.preventDefault();
+                                                            if (confirm('{{ __('Are you sure?') }}'))
+                                                                document.getElementById('{{ $deleteFormId }}').submit();">
+                                                    {{ __('Delete') }}
+                                                </a>
                                                 {!! $deleteForm->open() !!}
-                                                    {!! Html::submit(__('Delete'))
-                                                        ->class('text-red-600 hover:text-red-800') !!}
                                                 {!! $deleteForm->close() !!}
 
                                                 <a href="{{ route('labels.edit', $label) }}"
