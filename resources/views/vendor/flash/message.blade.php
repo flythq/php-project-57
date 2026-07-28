@@ -20,7 +20,7 @@
         <div class="border-l-4 rounded-b px-4 py-3 mt-8 mb-4 flex items-center justify-between {{ $styles[$level] ?? $styles['info'] }}"
              role="alert"
         >
-            <span>{!! $message['message'] !!}</span>
+            <span>{{ $message['message'] }}</span>
 
             @if ($message['important'])
                 <button type="button"

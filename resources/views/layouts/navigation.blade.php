@@ -8,14 +8,16 @@
 
         <div class="flex items-center lg:order-2">
             @auth
-                @php $logoutForm = Html::form('POST', route('logout')); @endphp
                 <a href="{{ route('logout') }}" onclick="event.preventDefault();
                                                     document.getElementById('logout-form').submit();"
                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2">
                     Выход
                 </a>
-                {!! $logoutForm->attribute('id', 'logout-form')->attribute('style', 'display: none;')->open() !!}
-                {!! $logoutForm->close() !!}
+                {{ html()->form('POST', route('logout'))
+                    ->attribute('id', 'logout-form')
+                    ->attribute('style', 'display: none;')
+                    ->open() }}
+                {{ html()->form('POST', route('logout'))->close() }}
             @else
                 <a href="{{ route('login') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Вход

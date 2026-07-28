@@ -9,31 +9,33 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    @php $filterForm = Html::form('GET', route('tasks.index')); @endphp
-                    {!! $filterForm->class('mb-4 flex flex-wrap gap-4 items-end')->novalidate()->open() !!}
+                    {{ html()->form('GET', route('tasks.index'))
+                        ->class('mb-4 flex flex-wrap gap-4 items-end')
+                        ->novalidate()
+                        ->open() }}
                         <div>
-                            {!! Html::select('filter[status_id]', $statuses->pluck('name', 'id'), request('filter.status_id'))
+                            {{ html()->select('filter[status_id]', $statuses->pluck('name', 'id'), request('filter.status_id'))
                                 ->id('filter_status_id')
                                 ->placeholder(__('Status'))
-                                ->class('mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm') !!}
+                                ->class('mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm') }}
                         </div>
 
                         <div>
-                            {!! Html::select('filter[assigned_to_id]', $users->pluck('name', 'id'), request('filter.assigned_to_id'))
+                            {{ html()->select('filter[assigned_to_id]', $users->pluck('name', 'id'), request('filter.assigned_to_id'))
                                 ->id('filter_assigned_to_id')
                                 ->placeholder(__('Assignee'))
-                                ->class('mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm') !!}
+                                ->class('mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm') }}
                         </div>
 
                         <div>
-                            {!! Html::select('filter[created_by_id]', $users->pluck('name', 'id'), request('filter.created_by_id'))
+                            {{ html()->select('filter[created_by_id]', $users->pluck('name', 'id'), request('filter.created_by_id'))
                                 ->id('filter_created_by_id')
                                 ->placeholder(__('Author'))
-                                ->class('mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm') !!}
+                                ->class('mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm') }}
                         </div>
 
-                        {!! Html::submit(__('Apply'))
-                            ->class('bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded') !!}
+                        {{ html()->submit(__('Apply'))
+                            ->class('bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded') }}
 
                         @auth
                             <a href="{{ route('tasks.create') }}"
@@ -41,7 +43,7 @@
                                 {{ __('Create task') }}
                             </a>
                         @endauth
-                    {!! $filterForm->close() !!}
+                    {{ html()->form('GET', route('tasks.index'))->close() }}
 
                     @if ($tasks->isEmpty())
                         <p class="text-gray-500">{{ __('No tasks') }}.</p>
@@ -77,21 +79,18 @@
                                                 <a href="{{ route('tasks.edit', $task) }}"
                                                    class="text-blue-600 hover:text-blue-800">{{ __('Edit') }}</a>
                                                 @can('delete', $task)
-                                                    @php
-                                                        $deleteFormId = 'delete-form-' . $task->id;
-                                                        $deleteForm = Html::form('DELETE', route('tasks.destroy', $task))
-                                                            ->attribute('id', $deleteFormId)
-                                                            ->class('hidden inline ml-3');
-                                                    @endphp
                                                     <a href="#"
                                                        class="text-red-600 hover:text-red-800 ml-3"
                                                        onclick="event.preventDefault();
                                                                 if (confirm('{{ __('Are you sure?') }}'))
-                                                                    document.getElementById('{{ $deleteFormId }}').submit();">
+                                                                    document.getElementById('delete-form-{{ $task->id }}').submit();">
                                                         {{ __('Delete') }}
                                                     </a>
-                                                    {!! $deleteForm->open() !!}
-                                                    {!! $deleteForm->close() !!}
+                                                    {{ html()->form('DELETE', route('tasks.destroy', $task))
+                                                        ->attribute('id', 'delete-form-' . $task->id)
+                                                        ->class('hidden inline ml-3')
+                                                        ->open() }}
+                                                    {{ html()->form('DELETE', route('tasks.destroy', $task))->close() }}
                                                 @endcan
                                             @endauth
                                         </td>

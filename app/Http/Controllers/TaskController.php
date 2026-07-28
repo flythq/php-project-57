@@ -9,13 +9,17 @@ use App\Models\TaskStatus;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class TaskController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Task::class, 'task');
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -54,14 +58,10 @@ class TaskController extends Controller
      */
     public function store(StoreTaskRequest $request): RedirectResponse
     {
-        $data = $request->validated();
-        $labels = $data['labels'] ?? [];
-        unset($data['labels']);
-
-        $task = new Task($data);
-        $task->created_by_id = Auth::id();
+        $validated = $request->safe();
+        $task = Auth::user()->createdTasks()->make($validated->except('labels'));
         $task->save();
-        $task->labels()->sync($labels);
+        $task->labels()->sync($validated->input('labels', []));
 
         flash(__('Task created successfully.'))->success();
 
@@ -95,12 +95,9 @@ class TaskController extends Controller
      */
     public function update(StoreTaskRequest $request, Task $task): RedirectResponse
     {
-        $data = $request->validated();
-        $labels = $data['labels'] ?? [];
-        unset($data['labels']);
-
-        $task->update($data);
-        $task->labels()->sync($labels);
+        $validated = $request->safe();
+        $task->update($validated->except('labels'));
+        $task->labels()->sync($validated->input('labels', []));
 
         flash(__('Task updated successfully.'))->success();
 
@@ -112,8 +109,6 @@ class TaskController extends Controller
      */
     public function destroy(Task $task): RedirectResponse
     {
-        Gate::authorize('delete', $task);
-
         $task->delete();
 
         flash(__('Task deleted successfully.'))->success();

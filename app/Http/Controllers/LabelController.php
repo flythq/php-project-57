@@ -9,6 +9,11 @@ use Illuminate\View\View;
 
 class LabelController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Label::class, 'label');
+    }
+
     /**
      * Display a listing of the resource.
      */
