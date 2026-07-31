@@ -8,7 +8,6 @@ use App\Models\Task;
 use App\Models\TaskStatus;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -59,7 +58,7 @@ class TaskController extends Controller
     public function store(StoreTaskRequest $request): RedirectResponse
     {
         $validated = $request->safe();
-        $task = Auth::user()->createdTasks()->make($validated->except('labels'));
+        $task = $request->user()->createdTasks()->make($validated->except('labels'));
         $task->save();
         $task->labels()->sync($validated->input('labels', []));
 
