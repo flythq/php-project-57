@@ -10,18 +10,18 @@ class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_login_screen_can_be_rendered(): void
+    public function testLoginScreenCanBeRendered(): void
     {
-        $response = $this->get('/login');
+        $response = $this->get(route('login'));
 
         $response->assertStatus(200);
     }
 
-    public function test_users_can_not_authenticate_with_invalid_password(): void
+    public function testUsersCanNotAuthenticateWithInvalidPassword(): void
     {
         $user = User::factory()->create();
 
-        $this->post('/login', [
+        $this->post(route('login.store'), [
             'email' => $user->email,
             'password' => 'wrong-password',
         ])->assertSessionHasErrors('email');
@@ -29,26 +29,26 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_users_can_authenticate_with_valid_credentials(): void
+    public function testUsersCanAuthenticateWithValidCredentials(): void
     {
         $user = User::factory()->create(['password' => 'password123']);
 
-        $response = $this->post('/login', [
+        $response = $this->post(route('login.store'), [
             'email' => $user->email,
             'password' => 'password123',
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect('/');
+        $response->assertRedirect(route('home'));
     }
 
-    public function test_users_can_logout(): void
+    public function testUsersCanLogout(): void
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->post('/logout');
+        $response = $this->actingAs($user)->post(route('logout'));
 
         $this->assertGuest();
-        $response->assertRedirect('/');
+        $response->assertRedirect(route('home'));
     }
 }

@@ -21,107 +21,107 @@ class TaskStatusTest extends TestCase
         $this->user = User::factory()->create();
     }
 
-    public function test_anyone_can_see_statuses_index(): void
+    public function testAnyoneCanSeeStatusesIndex(): void
     {
         $status = TaskStatus::factory()->create();
 
-        $this->get('/task_statuses')->assertStatus(200)->assertSee($status->name);
+        $this->get(route('task_statuses.index'))->assertStatus(200)->assertSee($status->name);
     }
 
-    public function test_authenticated_user_can_see_statuses_index(): void
+    public function testAuthenticatedUserCanSeeStatusesIndex(): void
     {
         $status = TaskStatus::factory()->create();
 
-        $response = $this->actingAs($this->user)->get('/task_statuses');
+        $response = $this->actingAs($this->user)->get(route('task_statuses.index'));
 
         $response->assertStatus(200);
         $response->assertSee($status->name);
     }
 
-    public function test_authenticated_user_can_open_create_form(): void
+    public function testAuthenticatedUserCanOpenCreateForm(): void
     {
-        $this->actingAs($this->user)->get('/task_statuses/create')->assertStatus(200);
+        $this->actingAs($this->user)->get(route('task_statuses.create'))->assertStatus(200);
     }
 
-    public function test_authenticated_user_can_store_status(): void
+    public function testAuthenticatedUserCanStoreStatus(): void
     {
-        $response = $this->actingAs($this->user)->post('/task_statuses', [
+        $response = $this->actingAs($this->user)->post(route('task_statuses.store'), [
             'name' => 'в работе',
         ]);
 
-        $response->assertRedirect('/task_statuses');
+        $response->assertRedirect(route('task_statuses.index'));
         $this->assertDatabaseHas('task_statuses', ['name' => 'в работе']);
     }
 
-    public function test_store_requires_name(): void
+    public function testStoreRequiresName(): void
     {
         $this->actingAs($this->user)
-            ->post('/task_statuses', ['name' => ''])
+            ->post(route('task_statuses.store'), ['name' => ''])
             ->assertSessionHasErrors('name');
     }
 
-    public function test_store_rejects_duplicate_name(): void
+    public function testStoreRejectsDuplicateName(): void
     {
         TaskStatus::factory()->create(['name' => 'в работе']);
 
         $this->actingAs($this->user)
-            ->post('/task_statuses', ['name' => 'в работе'])
+            ->post(route('task_statuses.store'), ['name' => 'в работе'])
             ->assertSessionHasErrors('name');
 
         $this->assertDatabaseCount('task_statuses', 1);
     }
 
-    public function test_update_allows_keeping_same_name(): void
+    public function testUpdateAllowsKeepingSameName(): void
     {
         $status = TaskStatus::factory()->create(['name' => 'в работе']);
 
         $this->actingAs($this->user)
-            ->patch("/task_statuses/{$status->id}", ['name' => 'в работе'])
-            ->assertRedirect('/task_statuses');
+            ->patch(route('task_statuses.update', $status), ['name' => 'в работе'])
+            ->assertRedirect(route('task_statuses.index'));
 
         $this->assertDatabaseHas('task_statuses', ['id' => $status->id, 'name' => 'в работе']);
     }
 
-    public function test_authenticated_user_can_open_edit_form(): void
+    public function testAuthenticatedUserCanOpenEditForm(): void
     {
         $status = TaskStatus::factory()->create();
 
         $this->actingAs($this->user)
-            ->get("/task_statuses/{$status->id}/edit")
+            ->get(route('task_statuses.edit', $status))
             ->assertStatus(200)
             ->assertSee($status->name);
     }
 
-    public function test_authenticated_user_can_update_status(): void
+    public function testAuthenticatedUserCanUpdateStatus(): void
     {
         $status = TaskStatus::factory()->create(['name' => 'старый']);
 
         $this->actingAs($this->user)
-            ->patch("/task_statuses/{$status->id}", ['name' => 'новый'])
-            ->assertRedirect('/task_statuses');
+            ->patch(route('task_statuses.update', $status), ['name' => 'новый'])
+            ->assertRedirect(route('task_statuses.index'));
 
         $this->assertDatabaseHas('task_statuses', ['id' => $status->id, 'name' => 'новый']);
     }
 
-    public function test_authenticated_user_can_delete_status(): void
+    public function testAuthenticatedUserCanDeleteStatus(): void
     {
         $status = TaskStatus::factory()->create();
 
         $this->actingAs($this->user)
-            ->delete("/task_statuses/{$status->id}")
-            ->assertRedirect('/task_statuses');
+            ->delete(route('task_statuses.destroy', $status))
+            ->assertRedirect(route('task_statuses.index'));
 
         $this->assertDatabaseMissing('task_statuses', ['id' => $status->id]);
     }
 
-    public function test_status_linked_to_task_cannot_be_deleted(): void
+    public function testStatusLinkedToTaskCannotBeDeleted(): void
     {
         $status = TaskStatus::factory()->create();
         Task::factory()->for($status, 'status')->create();
 
         $this->actingAs($this->user)
-            ->delete("/task_statuses/{$status->id}")
-            ->assertRedirect('/task_statuses');
+            ->delete(route('task_statuses.destroy', $status))
+            ->assertRedirect(route('task_statuses.index'));
 
         $this->assertDatabaseHas('task_statuses', ['id' => $status->id]);
     }

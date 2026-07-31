@@ -21,89 +21,89 @@ class LabelTest extends TestCase
         $this->user = User::factory()->create();
     }
 
-    public function test_anyone_can_see_labels_index(): void
+    public function testAnyoneCanSeeLabelsIndex(): void
     {
         $label = Label::factory()->create();
 
-        $this->get('/labels')->assertStatus(200)->assertSee($label->name);
+        $this->get(route('labels.index'))->assertStatus(200)->assertSee($label->name);
     }
 
-    public function test_guest_cannot_open_create_form(): void
+    public function testGuestCannotOpenCreateForm(): void
     {
-        $this->get('/labels/create')->assertRedirect('/login');
+        $this->get(route('labels.create'))->assertRedirect(route('login'));
     }
 
-    public function test_authenticated_user_can_store_label(): void
+    public function testAuthenticatedUserCanStoreLabel(): void
     {
-        $response = $this->actingAs($this->user)->post('/labels', [
+        $response = $this->actingAs($this->user)->post(route('labels.store'), [
             'name' => 'bug',
             'description' => 'something is wrong',
         ]);
 
-        $response->assertRedirect('/labels');
+        $response->assertRedirect(route('labels.index'));
         $this->assertDatabaseHas('labels', ['name' => 'bug', 'description' => 'something is wrong']);
     }
 
-    public function test_store_requires_name(): void
+    public function testStoreRequiresName(): void
     {
         $this->actingAs($this->user)
-            ->post('/labels', ['name' => ''])
+            ->post(route('labels.store'), ['name' => ''])
             ->assertSessionHasErrors('name');
     }
 
-    public function test_store_rejects_duplicate_name(): void
+    public function testStoreRejectsDuplicateName(): void
     {
         Label::factory()->create(['name' => 'bug']);
 
         $this->actingAs($this->user)
-            ->post('/labels', ['name' => 'bug'])
+            ->post(route('labels.store'), ['name' => 'bug'])
             ->assertSessionHasErrors('name');
 
         $this->assertDatabaseCount('labels', 1);
     }
 
-    public function test_update_allows_keeping_same_name(): void
+    public function testUpdateAllowsKeepingSameName(): void
     {
         $label = Label::factory()->create(['name' => 'bug']);
 
         $this->actingAs($this->user)
-            ->patch("/labels/{$label->id}", ['name' => 'bug', 'description' => ''])
-            ->assertRedirect('/labels');
+            ->patch(route('labels.update', $label), ['name' => 'bug', 'description' => ''])
+            ->assertRedirect(route('labels.index'));
 
         $this->assertDatabaseHas('labels', ['id' => $label->id, 'name' => 'bug']);
     }
 
-    public function test_authenticated_user_can_update_label(): void
+    public function testAuthenticatedUserCanUpdateLabel(): void
     {
         $label = Label::factory()->create(['name' => 'old']);
 
         $this->actingAs($this->user)
-            ->patch("/labels/{$label->id}", ['name' => 'new', 'description' => ''])
-            ->assertRedirect('/labels');
+            ->patch(route('labels.update', $label), ['name' => 'new', 'description' => ''])
+            ->assertRedirect(route('labels.index'));
 
         $this->assertDatabaseHas('labels', ['id' => $label->id, 'name' => 'new']);
     }
 
-    public function test_authenticated_user_can_delete_label(): void
+    public function testAuthenticatedUserCanDeleteLabel(): void
     {
         $label = Label::factory()->create();
 
         $this->actingAs($this->user)
-            ->delete("/labels/{$label->id}")
-            ->assertRedirect('/labels');
+            ->delete(route('labels.destroy', $label))
+            ->assertRedirect(route('labels.index'));
 
         $this->assertDatabaseMissing('labels', ['id' => $label->id]);
     }
 
-    public function test_label_linked_to_task_cannot_be_deleted(): void
+    public function testLabelLinkedToTaskCannotBeDeleted(): void
     {
         $label = Label::factory()->create();
         $task = Task::factory()->for($this->user, 'createdBy')->create();
         $task->labels()->sync([$label->id]);
 
         $this->actingAs($this->user)
-            ->delete("/labels/{$label->id}")
-            ->assertRedirect('/labels');
+            ->delete(route('labels.destroy', $label))
+            ->assertRedirect(route('labels.index'));
 
         $this->assertDatabaseHas('labels', ['id' => $label->id]);
     }

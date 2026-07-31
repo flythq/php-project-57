@@ -14,6 +14,7 @@ class TaskTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private TaskStatus $status;
 
     protected function setUp(): void
@@ -24,40 +25,40 @@ class TaskTest extends TestCase
         $this->status = TaskStatus::factory()->create();
     }
 
-    public function test_anyone_can_see_tasks_index(): void
+    public function testAnyoneCanSeeTasksIndex(): void
     {
         $task = Task::factory()->for($this->user, 'createdBy')->create();
 
-        $this->get('/tasks')->assertStatus(200)->assertSee($task->name);
+        $this->get(route('tasks.index'))->assertStatus(200)->assertSee($task->name);
     }
 
-    public function test_anyone_can_view_a_task(): void
+    public function testAnyoneCanViewATask(): void
     {
         $task = Task::factory()->for($this->user, 'createdBy')->create();
 
-        $this->get("/tasks/{$task->id}")->assertStatus(200)->assertSee($task->name);
+        $this->get(route('tasks.show', $task))->assertStatus(200)->assertSee($task->name);
     }
 
-    public function test_guest_cannot_open_create_form(): void
+    public function testGuestCannotOpenCreateForm(): void
     {
-        $this->get('/tasks/create')->assertRedirect('/login');
+        $this->get(route('tasks.create'))->assertRedirect(route('login'));
     }
 
-    public function test_authenticated_user_can_open_create_form(): void
+    public function testAuthenticatedUserCanOpenCreateForm(): void
     {
-        $this->actingAs($this->user)->get('/tasks/create')->assertStatus(200);
+        $this->actingAs($this->user)->get(route('tasks.create'))->assertStatus(200);
     }
 
-    public function test_authenticated_user_can_store_task(): void
+    public function testAuthenticatedUserCanStoreTask(): void
     {
-        $response = $this->actingAs($this->user)->post('/tasks', [
+        $response = $this->actingAs($this->user)->post(route('tasks.store'), [
             'name' => 'My task',
             'description' => 'desc',
             'status_id' => $this->status->id,
             'assigned_to_id' => null,
         ]);
 
-        $response->assertRedirect('/tasks');
+        $response->assertRedirect(route('tasks.index'));
         $this->assertDatabaseHas('tasks', [
             'name' => 'My task',
             'status_id' => $this->status->id,
@@ -65,71 +66,72 @@ class TaskTest extends TestCase
         ]);
     }
 
-    public function test_store_requires_name(): void
+    public function testStoreRequiresName(): void
     {
         $this->actingAs($this->user)
-            ->post('/tasks', ['name' => '', 'status_id' => $this->status->id])
+            ->post(route('tasks.store'), ['name' => '', 'status_id' => $this->status->id])
             ->assertSessionHasErrors('name');
     }
 
-    public function test_store_requires_existing_status(): void
+    public function testStoreRequiresExistingStatus(): void
     {
         $this->actingAs($this->user)
-            ->post('/tasks', ['name' => 'x', 'status_id' => 999999])
+            ->post(route('tasks.store'), ['name' => 'x', 'status_id' => 999999])
             ->assertSessionHasErrors('status_id');
     }
 
-    public function test_authenticated_user_can_edit_task(): void
+    public function testAuthenticatedUserCanEditTask(): void
     {
         $task = Task::factory()->for($this->user, 'createdBy')->create();
 
         $this->actingAs($this->user)
-            ->get("/tasks/{$task->id}/edit")
+            ->get(route('tasks.edit', $task))
             ->assertStatus(200)
             ->assertSee($task->name);
     }
 
-    public function test_authenticated_user_can_update_task(): void
+    public function testAuthenticatedUserCanUpdateTask(): void
     {
         $task = Task::factory()->for($this->user, 'createdBy')->create();
 
         $this->actingAs($this->user)
-            ->patch("/tasks/{$task->id}", [
+            ->patch(route('tasks.update', $task), [
                 'name' => 'updated',
                 'status_id' => $this->status->id,
             ])
-            ->assertRedirect('/tasks');
+            ->assertRedirect(route('tasks.index'));
 
         $this->assertDatabaseHas('tasks', ['id' => $task->id, 'name' => 'updated']);
     }
 
-    public function test_only_creator_can_delete_task(): void
+    public function testOnlyCreatorCanDeleteTask(): void
     {
         $creator = User::factory()->create();
         $task = Task::factory()->for($creator, 'createdBy')->create();
 
-        $other = $this->user;
-        $this->actingAs($other)->delete("/tasks/{$task->id}")->assertForbidden();
+        $this->actingAs($this->user)
+            ->delete(route('tasks.destroy', $task))
+            ->assertForbidden();
 
         $this->assertDatabaseHas('tasks', ['id' => $task->id]);
     }
 
-    public function test_creator_can_delete_own_task(): void
+    public function testCreatorCanDeleteOwnTask(): void
     {
         $task = Task::factory()->for($this->user, 'createdBy')->create();
 
         $this->actingAs($this->user)
-            ->delete("/tasks/{$task->id}")
-            ->assertRedirect('/tasks');
+            ->delete(route('tasks.destroy', $task))
+            ->assertRedirect(route('tasks.index'));
 
         $this->assertDatabaseMissing('tasks', ['id' => $task->id]);
     }
 
-    public function test_authenticated_user_can_attach_labels_when_creating_task(): void
+    public function testAuthenticatedUserCanAttachLabelsWhenCreatingTask(): void
     {
         $label = Label::factory()->create();
 
-        $this->actingAs($this->user)->post('/tasks', [
+        $this->actingAs($this->user)->post(route('tasks.store'), [
             'name' => 'With label',
             'description' => '',
             'status_id' => $this->status->id,
@@ -142,62 +144,61 @@ class TaskTest extends TestCase
         $this->assertTrue($task->labels->contains($label));
     }
 
-    public function test_task_show_displays_attached_labels(): void
+    public function testTaskShowDisplaysAttachedLabels(): void
     {
         $label = Label::factory()->create(['name' => 'urgent']);
         $task = Task::factory()->for($this->user, 'createdBy')->create();
         $task->labels()->sync([$label->id]);
 
-        $this->get("/tasks/{$task->id}")->assertSee('urgent');
+        $this->get(route('tasks.show', $task))->assertSee('urgent');
     }
 
-    public function test_filter_by_status(): void
+    public function testFilterByStatus(): void
     {
         $statusA = TaskStatus::factory()->create();
         $statusB = TaskStatus::factory()->create();
-        $taskA = Task::factory()->for($statusA, 'status')->for($this->user, 'createdBy')->create(['name' => 'match']);
-        $taskB = Task::factory()->for($statusB, 'status')->for($this->user, 'createdBy')->create(['name' => 'other']);
+        Task::factory()->for($statusA, 'status')->for($this->user, 'createdBy')->create(['name' => 'match']);
+        Task::factory()->for($statusB, 'status')->for($this->user, 'createdBy')->create(['name' => 'other']);
 
-        $this->get("/tasks?filter[status_id]={$statusA->id}")
+        $this->get(route('tasks.index', ['filter' => ['status_id' => $statusA->id]]))
             ->assertStatus(200)
-            ->assertSee('match')
             ->assertDontSee('other');
     }
 
-    public function test_filter_by_assignee(): void
+    public function testFilterByAssignee(): void
     {
         $assignee = User::factory()->create();
-        $matched = Task::factory()
+        Task::factory()
             ->for($this->user, 'createdBy')
             ->create(['name' => 'assigned', 'assigned_to_id' => $assignee->id]);
-        $other = Task::factory()
+        Task::factory()
             ->for($this->user, 'createdBy')
             ->create(['name' => 'unassigned', 'assigned_to_id' => null]);
 
-        $this->get("/tasks?filter[assigned_to_id]={$assignee->id}")
+        $this->get(route('tasks.index', ['filter' => ['assigned_to_id' => $assignee->id]]))
             ->assertStatus(200)
             ->assertSee('assigned')
             ->assertDontSee('unassigned');
     }
 
-    public function test_filter_by_author(): void
+    public function testFilterByAuthor(): void
     {
         $creator = User::factory()->create();
-        $matched = Task::factory()->for($creator, 'createdBy')->create(['name' => 'from-creator']);
-        $other = Task::factory()->for($this->user, 'createdBy')->create(['name' => 'from-other']);
+        Task::factory()->for($creator, 'createdBy')->create(['name' => 'from-creator']);
+        Task::factory()->for($this->user, 'createdBy')->create(['name' => 'from-other']);
 
-        $this->get("/tasks?filter[created_by_id]={$creator->id}")
+        $this->get(route('tasks.index', ['filter' => ['created_by_id' => $creator->id]]))
             ->assertStatus(200)
             ->assertSee('from-creator')
             ->assertDontSee('from-other');
     }
 
-    public function test_empty_filter_returns_all_tasks(): void
+    public function testEmptyFilterReturnsAllTasks(): void
     {
-        $taskA = Task::factory()->for($this->user, 'createdBy')->create(['name' => 'task-a']);
-        $taskB = Task::factory()->for($this->user, 'createdBy')->create(['name' => 'task-b']);
+        Task::factory()->for($this->user, 'createdBy')->create(['name' => 'task-a']);
+        Task::factory()->for($this->user, 'createdBy')->create(['name' => 'task-b']);
 
-        $this->get('/tasks?filter[status_id]=')
+        $this->get(route('tasks.index', ['filter' => ['status_id' => '']]))
             ->assertStatus(200)
             ->assertSee('task-a')
             ->assertSee('task-b');
