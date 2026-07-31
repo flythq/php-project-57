@@ -33,7 +33,7 @@ class TaskController extends Controller
             )
             ->with(['status', 'createdBy', 'assignedTo', 'labels'])
             ->orderByDesc('id')
-            ->paginate(15);
+            ->paginate(2)->withQueryString();
 
         $statuses = TaskStatus::orderBy('name')->get();
         $users = User::orderBy('name')->get();
