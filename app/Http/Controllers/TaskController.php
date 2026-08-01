@@ -45,11 +45,12 @@ class TaskController extends Controller
      */
     public function create(): View
     {
+        $task = new Task;
         $statuses = TaskStatus::orderBy('name')->get();
         $users = User::orderBy('name')->get();
         $labels = Label::orderBy('name')->get();
 
-        return view('tasks.create', compact('statuses', 'users', 'labels'));
+        return view('tasks.form', compact('task', 'statuses', 'users', 'labels'));
     }
 
     /**
@@ -87,7 +88,7 @@ class TaskController extends Controller
         $users = User::orderBy('name')->get();
         $labels = Label::orderBy('name')->get();
 
-        return view('tasks.edit', compact('task', 'statuses', 'users', 'labels'));
+        return view('tasks.form', compact('task', 'statuses', 'users', 'labels'));
     }
 
     /**

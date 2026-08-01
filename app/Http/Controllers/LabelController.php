@@ -29,7 +29,9 @@ class LabelController extends Controller
      */
     public function create(): View
     {
-        return view('labels.create');
+        $label = new Label;
+
+        return view('labels.form', compact('label'));
     }
 
     /**
@@ -49,7 +51,7 @@ class LabelController extends Controller
      */
     public function edit(Label $label): View
     {
-        return view('labels.edit', compact('label'));
+        return view('labels.form', compact('label'));
     }
 
     /**

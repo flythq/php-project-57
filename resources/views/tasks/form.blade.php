@@ -1,7 +1,13 @@
+@php
+    $isUpdate = $task->exists;
+    $method = $isUpdate ? 'PATCH' : 'POST';
+    $action = $isUpdate ? route('tasks.update', $task) : route('tasks.store');
+@endphp
+
 <x-app-layout>
     <x-slot name="header">
         <h2 class="text-6xl text-gray-900 leading-tight">
-            {{ __('Edit task') }}
+            {{ $isUpdate ? __('Edit task') : __('Create task') }}
         </h2>
     </x-slot>
 
@@ -9,7 +15,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    {{ html()->form('PATCH', route('tasks.update', $task))->novalidate()->open() }}
+                    {{ html()->form($method, $action)->novalidate()->open() }}
 
                         <div>
                             {{ html()->label(__('Name'), 'name')->class('block font-medium text-sm text-gray-700') }}
@@ -31,7 +37,8 @@
                         <div class="mt-4">
                             {{ html()->label(__('Status'), 'status_id')->class('block font-medium text-sm text-gray-700') }}
                             {{ html()->select('status_id', $statuses->pluck('name', 'id'), $task->status_id)->id('status_id')
-                                ->class('block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm') }}
+                                ->class('block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm')
+                                ->placeholder('—') }}
                             <x-input-error :messages="$errors->get('status_id')" class="mt-2" />
                         </div>
 
@@ -57,10 +64,10 @@
                                 {{ __('Back') }}
                             </a>
 
-                            {{ html()->submit(__('Update'))
+                            {{ html()->submit($isUpdate ? __('Update') : __('Create'))
                                 ->class('inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150') }}
                         </div>
-                    {{ html()->form('PATCH', route('tasks.update', $task))->novalidate()->close() }}
+                    {{ html()->form()->close() }}
                 </div>
             </div>
         </div>
