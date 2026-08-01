@@ -29,7 +29,7 @@ class TaskStatusController extends Controller
      */
     public function create(): View
     {
-        $taskStatus = new TaskStatus;
+        $taskStatus = new TaskStatus();
 
         return view('task_statuses.form', compact('taskStatus'));
     }

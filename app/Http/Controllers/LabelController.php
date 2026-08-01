@@ -29,7 +29,7 @@ class LabelController extends Controller
      */
     public function create(): View
     {
-        $label = new Label;
+        $label = new Label();
 
         return view('labels.form', compact('label'));
     }

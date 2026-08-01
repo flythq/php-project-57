@@ -45,7 +45,7 @@ class TaskController extends Controller
      */
     public function create(): View
     {
-        $task = new Task;
+        $task = new Task();
         $statuses = TaskStatus::orderBy('name')->get();
         $users = User::orderBy('name')->get();
         $labels = Label::orderBy('name')->get();
