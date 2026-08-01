@@ -60,7 +60,8 @@ class TaskController extends Controller
         $validated = $request->safe();
         $task = $request->user()->createdTasks()->make($validated->except('labels'));
         $task->save();
-        $task->labels()->sync($validated->input('labels', []));
+        $labels = array_filter((array) $validated->input('labels', []));
+        $task->labels()->sync($labels);
 
         flash(__('Task created successfully.'))->success();
 
@@ -96,7 +97,8 @@ class TaskController extends Controller
     {
         $validated = $request->safe();
         $task->update($validated->except('labels'));
-        $task->labels()->sync($validated->input('labels', []));
+        $labels = array_filter((array) $validated->input('labels', []));
+        $task->labels()->sync($labels);
 
         flash(__('Task updated successfully.'))->success();
 
